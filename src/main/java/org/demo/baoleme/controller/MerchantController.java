@@ -71,7 +71,7 @@ public class MerchantController {
         }
 
         String loginKey = "merchant:login:" + result.getId();
-        if (Boolean.TRUE.equals(redisTemplate.hasKey(loginKey))) {
+        if (redisTemplate.hasKey(loginKey)) {
             return ResponseBuilder.fail("该商家已登录，请先登出");
         }
 
