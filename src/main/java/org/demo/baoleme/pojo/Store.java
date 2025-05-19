@@ -2,6 +2,7 @@ package org.demo.baoleme.pojo;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -23,12 +24,7 @@ public class Store {
     /**
      * 评分（decimal(2,1), 默认5.0）
      */
-    private BigDecimal rating = BigDecimal.valueOf(5.0);
-
-    /**
-     * 余额（decimal(10,2), 默认0.0）
-     */
-    private BigDecimal balance = BigDecimal.ZERO;
+    private BigDecimal rating;
 
     /**
      * 状态（1-开启，0-关闭）

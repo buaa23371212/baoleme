@@ -8,12 +8,10 @@ import java.time.LocalDateTime;
 
 @Data
 public class StoreCreateRequest {
-    private Long merchantId;
     private String name;
     private String desc;
     private String location;
     private BigDecimal rating;
-    private BigDecimal balance;
     private int status;
     private LocalDateTime createdAt;
     private String image;

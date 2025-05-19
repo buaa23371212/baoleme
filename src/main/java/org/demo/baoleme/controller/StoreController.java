@@ -2,6 +2,7 @@ package org.demo.baoleme.controller;
 
 import org.demo.baoleme.common.CommonResponse;
 import org.demo.baoleme.common.ResponseBuilder;
+import org.demo.baoleme.common.UserHolder;
 import org.demo.baoleme.dto.request.store.StoreCreateRequest;
 import org.demo.baoleme.dto.request.store.StoreDeleteRequest;
 import org.demo.baoleme.dto.request.store.StoreUpdateRequest;
@@ -25,49 +26,74 @@ public class StoreController {
     }
 
     @PostMapping("/create")
-    public CommonResponse createStore(@RequestBody StoreCreateRequest request) {
-        // Step1: 创建空店铺对象
-        Store store = new Store();
+    public CommonResponse createStore(
+            @RequestHeader("Authorization") String tokenHeader,
+            @RequestBody StoreCreateRequest request
+    ) {
+        System.out.println("收到创建请求: " + request); // 错误修正：更新->创建
 
-        // Step2: 拷贝请求参数到领域对象
+        // Step1: 获取商户ID
+        Long merchantId = UserHolder.getId();
+
+        // Step2: 初始化店铺对象
+        Store store = new Store();
+        store.setMerchantId(merchantId);
+
+        // Step3: 拷贝请求参数
         BeanUtils.copyProperties(request, store);
 
-        // Step3: 调用服务层创建店铺
+        // Step4: 执行创建操作
         Store createdStore = storeService.createStore(store);
 
-        // Step4: 处理空返回值异常情况
+        // Step5: 处理创建结果
         if (createdStore == null) {
+            System.out.println("创建失败，店铺ID: " + request.getName());
             return ResponseBuilder.fail("店铺创建失败，参数校验不通过");
         }
 
-        // Step5: 构造标准化响应
+        // Step6: 构造响应体
         StoreCreateResponse response = new StoreCreateResponse();
         BeanUtils.copyProperties(createdStore, response);
+
+        System.out.println("创建成功，响应: " + response);
         return ResponseBuilder.ok(response);
     }
 
-    @PostMapping("/view")  // 改为POST方式接收请求体
-    public CommonResponse getStoreById(@RequestBody StoreViewInfoRequest request) {
-        // Step1: 从请求体中提取店铺ID
+    @PostMapping("/view")
+    public CommonResponse getStoreById(
+            @RequestHeader("Authorization") String tokenHeader,
+            @RequestBody StoreViewInfoRequest request
+    ) {
+        System.out.println("收到查询请求: " + request);
+
+        // Step1: 提取店铺ID
         Long storeId = request.getStoreId();
 
-        // Step2: 查询店铺详细信息
+        // Step2: 执行数据库查询
         Store store = storeService.getStoreById(storeId);
 
-        // Step3: 处理空查询结果
+        // Step3: 处理空结果
         if (store == null) {
+            System.out.println("查询失败，无效店铺ID: " + storeId);
             return ResponseBuilder.fail("店铺ID不存在");
         }
 
-        // Step4: 转换领域对象为响应DTO
+        // Step4: 数据转换
         StoreViewInfoResponse response = new StoreViewInfoResponse();
         BeanUtils.copyProperties(store, response);
+
+        System.out.println("查询成功，店铺信息: " + response);
         return ResponseBuilder.ok(response);
     }
 
     @PutMapping("/update")
-    public CommonResponse updateStore(@RequestBody StoreUpdateRequest request) {
-        // Step1: 初始化待更新店铺对象
+    public CommonResponse updateStore(
+            @RequestHeader("Authorization") String tokenHeader,
+            @RequestBody StoreUpdateRequest request
+    ) {
+        System.out.println("收到更新请求: " + request);
+
+        // Step1: 初始化领域对象
         Store store = new Store();
         store.setId(request.getId());
 
@@ -77,46 +103,62 @@ public class StoreController {
         // Step3: 执行更新操作
         boolean success = storeService.updateStore(store);
 
-        // Step4: 处理更新失败情况
+        // Step4: 处理失败场景
         if (!success) {
+            System.out.println("更新失败，店铺ID: " + request.getId());
             return ResponseBuilder.fail("店铺信息更新失败");
         }
 
-        // Step5: 返回更新后的完整数据
+        // Step5: 构造响应数据
         StoreUpdateResponse response = new StoreUpdateResponse();
         BeanUtils.copyProperties(store, response);
+
+        System.out.println("更新成功，响应: " + response);
         return ResponseBuilder.ok(response);
     }
 
-    @PutMapping("/status")  // 路径修改为统一使用请求体
-    public CommonResponse toggleStoreStatus(@RequestBody StoreUpdateRequest request) {
-        // Step1: 从请求体获取参数
+    @PutMapping("/status")
+    public CommonResponse toggleStoreStatus(
+            @RequestHeader("Authorization") String tokenHeader,
+            @RequestBody StoreUpdateRequest request
+    ) {
+        System.out.println("收到状态修改请求: " + request);
+
+        // Step1: 解析请求参数
         Long storeId = request.getId();
         int status = request.getStatus();
 
-        // Step2: 校验状态值合法性
+        // Step2: 校验状态值
         if (status < 0 || status > 1) {
+            System.out.println("非法状态值: " + status);
             return ResponseBuilder.fail("状态值必须是0或1");
         }
 
-        // Step3: 执行状态切换操作
+        // Step3: 执行状态修改
         boolean success = storeService.toggleStoreStatus(storeId, status);
 
-        // Step4: 根据操作结果返回响应
+        // Step4: 返回操作结果
+        System.out.println(success ? "状态修改成功" : "状态修改失败");
         return success ?
                 ResponseBuilder.ok("店铺状态更新成功") :
                 ResponseBuilder.fail("状态更新失败，店铺可能不存在");
     }
 
-    @DeleteMapping("/delete")  // 改为使用请求体的DELETE方法
-    public CommonResponse deleteStore(@RequestBody StoreDeleteRequest request) {
-        // Step1: 从请求体获取店铺ID
+    @DeleteMapping("/delete")
+    public CommonResponse deleteStore(
+            @RequestHeader("Authorization") String tokenHeader,
+            @RequestBody StoreDeleteRequest request
+    ) {
+        System.out.println("收到删除请求: " + request);
+
+        // Step1: 获取目标店铺ID
         Long storeId = request.getStoreId();
 
         // Step2: 执行删除操作
         boolean success = storeService.deleteStore(storeId);
 
-        // Step3: 处理删除结果
+        // Step3: 处理操作结果
+        System.out.println(success ? "删除成功" : "删除失败");
         return success ?
                 ResponseBuilder.ok("店铺数据已删除") :
                 ResponseBuilder.fail("删除操作失败，店铺可能不存在");
