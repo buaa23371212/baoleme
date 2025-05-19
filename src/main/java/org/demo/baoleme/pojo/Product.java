@@ -29,6 +29,9 @@ public class Product {
 
     private BigDecimal rating;
 
+    /**
+     * 状态（1-开启，0-关闭）
+     */
     private Integer status;
 
     private LocalDateTime createdAt;
