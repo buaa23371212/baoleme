@@ -65,6 +65,7 @@ public class MerchantController {
 
         // Step3: 验证密码匹配
         // 使用 BCrypt 验证密码
+        // 第一个参数是明文密码（未加密），第二个参数是加密后的密码哈希
         if (!passwordEncoder.matches(request.getPassword(), result.getPassword())) {
             return ResponseBuilder.fail("密码错误");
         }
