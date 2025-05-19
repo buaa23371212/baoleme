@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductCreateRequest {
-    private String storeId;
+    private Long storeId;
     private String name;
     private String description;
     private BigDecimal price;

@@ -5,10 +5,10 @@ import org.demo.baoleme.pojo.Product;
 
 @Data
 public class ProductViewRequest {
-    private Long id;
+    private Long productId;
     private Long storeId;
     private String category;
-    private int status;
+    private Integer status;
     private int page;
     private int pageSize;
 }

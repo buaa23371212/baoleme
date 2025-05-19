@@ -59,7 +59,7 @@ public class ProductController {
         System.out.println("=== View Product Request ===");
         System.out.println("Request Body: " + request);
 
-        Long productId = request.getId();
+        Long productId = request.getProductId();
 
         // Step1: 查询商品详情
         Product product = productService.getProductById(productId);
@@ -117,6 +117,7 @@ public class ProductController {
         product.setId(request.getId());
 
         // Step2: 拷贝请求参数
+        // 可能会出现属性拷贝后数据类型不匹配的情况
         BeanUtils.copyProperties(request, product);
 
         // Step3: 调用 Service 更新数据
