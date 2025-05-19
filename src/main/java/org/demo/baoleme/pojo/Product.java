@@ -25,11 +25,11 @@ public class Product {
 
     private String category;
 
-    private int stock;
+    private Integer stock;
 
     private BigDecimal rating;
 
-    private int status;
+    private Integer status;
 
     private LocalDateTime createdAt;
 

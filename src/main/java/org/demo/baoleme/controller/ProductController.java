@@ -23,7 +23,10 @@ public class ProductController {
     }
 
     @PostMapping("/create")
-    public CommonResponse createProduct(@RequestBody ProductCreateRequest request) {
+    public CommonResponse createProduct(
+            @RequestHeader("Authorization") String tokenHeader,
+            @RequestBody ProductCreateRequest request
+    ) {
         // Step1: 创建 Product 对象并拷贝属性
         Product product = new Product();
         BeanUtils.copyProperties(request, product);
@@ -42,8 +45,13 @@ public class ProductController {
         return ResponseBuilder.ok(response);
     }
 
-    @GetMapping("/{productId}")
-    public CommonResponse getProductById(@PathVariable Long productId) {
+    @PostMapping("/view")
+    public CommonResponse getProductById(
+            @RequestHeader("Authorization") String tokenHeader,
+            @RequestBody ProductViewRequest request
+    ) {
+        Long productId = request.getId();
+
         // Step1: 查询商品详情
         Product product = productService.getProductById(productId);
 
@@ -58,8 +66,11 @@ public class ProductController {
         return ResponseBuilder.ok(response);
     }
 
-    @GetMapping("/store/{storeId}")
-    public CommonResponse getProductsByStore(@RequestBody ProductViewRequest request) {
+    @PostMapping("/store-products")
+    public CommonResponse getProductsByStore(
+            @RequestHeader("Authorization") String tokenHeader,
+            @RequestBody ProductViewRequest request
+    ) {
         Long storeId = request.getStoreId();
 
         // Step2: 查询店铺商品列表
@@ -78,7 +89,10 @@ public class ProductController {
     }
 
     @PutMapping("/update")
-    public CommonResponse updateProduct(@RequestBody ProductUpdateRequest request) {
+    public CommonResponse updateProduct(
+            @RequestHeader("Authorization") String tokenHeader,
+            @RequestBody ProductUpdateRequest request
+    ) {
         // Step1: 创建 Product 对象并设置 ID
         Product product = new Product();
         product.setId(request.getId());
@@ -100,9 +114,14 @@ public class ProductController {
         return ResponseBuilder.ok(response);
     }
 
-    @PutMapping("/{productId}/status")
-    public CommonResponse updateProductStatus(@PathVariable Long productId,
-                                              @RequestParam int status) {
+    @PutMapping("/status")
+    public CommonResponse updateProductStatus(
+            @RequestHeader("Authorization") String tokenHeader,
+            @RequestBody ProductUpdateRequest request
+    ) {
+        Long productId = request.getId();
+        int status = request.getStatus();
+
         // Step1: 执行状态更新
         boolean success = productService.updateProductStatus(productId, status);
 
@@ -112,11 +131,13 @@ public class ProductController {
                 ResponseBuilder.fail("状态更新失败");
     }
 
-    @DeleteMapping("/{productId}")
-    public CommonResponse deleteProduct(@PathVariable Long productId) {
-        // Step1: 创建 ProductDeleteRequest 对象
-        ProductDeleteRequest request = new ProductDeleteRequest();
-        request.setId(productId);
+    @PostMapping("/delete")
+    public CommonResponse deleteProduct(
+            @RequestHeader("Authorization") String tokenHeader,
+            @RequestBody ProductDeleteRequest request
+    ) {
+        // Step1: 从请求体中获取商品ID
+        Long productId = request.getId();
 
         // Step2: 执行删除操作
         boolean success = productService.deleteProduct(productId);
