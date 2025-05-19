@@ -27,7 +27,14 @@ public class ProductServiceImpl implements ProductService {
             return null;
         }
 
-        // Step2: 插入商品数据
+        // Step2: 检查store_id是否存在
+        Store store = storeMapper.selectById(product.getStoreId());
+        if (store == null) {
+            System.out.println("错误：店铺ID不存在");
+            return null;
+        }
+
+        // Step3: 插入商品数据
         int result = productMapper.insert(product);
         return result > 0 ? product : null;
     }

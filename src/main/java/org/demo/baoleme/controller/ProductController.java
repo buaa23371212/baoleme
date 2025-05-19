@@ -27,6 +27,9 @@ public class ProductController {
             @RequestHeader("Authorization") String tokenHeader,
             @RequestBody ProductCreateRequest request
     ) {
+        System.out.println("=== Create Product Request ===");
+        System.out.println("Request Body: " + request);
+
         // Step1: 创建 Product 对象并拷贝属性
         Product product = new Product();
         BeanUtils.copyProperties(request, product);
@@ -36,12 +39,15 @@ public class ProductController {
 
         // Step3: 处理创建结果
         if (createdProduct == null) {
-            return ResponseBuilder.fail("商品创建失败，请检查输入参数");
+            CommonResponse errorResponse = ResponseBuilder.fail("商品创建失败，请检查输入参数");
+            System.out.println("Response Body: " + errorResponse);
+            return errorResponse;
         }
 
         // Step4: 构建响应体
         ProductCreateResponse response = new ProductCreateResponse();
         response.setProductId(createdProduct.getId());
+        System.out.println("Response Body: " + response);
         return ResponseBuilder.ok(response);
     }
 
@@ -50,6 +56,9 @@ public class ProductController {
             @RequestHeader("Authorization") String tokenHeader,
             @RequestBody ProductViewRequest request
     ) {
+        System.out.println("=== View Product Request ===");
+        System.out.println("Request Body: " + request);
+
         Long productId = request.getId();
 
         // Step1: 查询商品详情
@@ -57,12 +66,15 @@ public class ProductController {
 
         // Step2: 验证查询结果
         if (product == null) {
-            return ResponseBuilder.fail("商品不存在");
+            CommonResponse errorResponse = ResponseBuilder.fail("商品不存在");
+            System.out.println("Response Body: " + errorResponse);
+            return errorResponse;
         }
 
         // Step3: 构建响应体
         ProductViewResponse response = new ProductViewResponse();
         BeanUtils.copyProperties(product, response);
+        System.out.println("Response Body: " + response);
         return ResponseBuilder.ok(response);
     }
 
@@ -71,6 +83,9 @@ public class ProductController {
             @RequestHeader("Authorization") String tokenHeader,
             @RequestBody ProductViewRequest request
     ) {
+        System.out.println("=== Store Products Request ===");
+        System.out.println("Request Body: " + request);
+
         Long storeId = request.getStoreId();
 
         // Step2: 查询店铺商品列表
@@ -85,6 +100,7 @@ public class ProductController {
                 })
                 .collect(Collectors.toList());
 
+        System.out.println("Response Body: " + responses);
         return ResponseBuilder.ok(responses);
     }
 
@@ -93,6 +109,9 @@ public class ProductController {
             @RequestHeader("Authorization") String tokenHeader,
             @RequestBody ProductUpdateRequest request
     ) {
+        System.out.println("=== Update Product Request ===");
+        System.out.println("Request Body: " + request);
+
         // Step1: 创建 Product 对象并设置 ID
         Product product = new Product();
         product.setId(request.getId());
@@ -105,12 +124,15 @@ public class ProductController {
 
         // Step4: 处理更新结果
         if (!success) {
-            return ResponseBuilder.fail("更新失败，请检查商品 ID 是否存在");
+            CommonResponse errorResponse = ResponseBuilder.fail("更新失败，请检查商品 ID 是否存在");
+            System.out.println("Response Body: " + errorResponse);
+            return errorResponse;
         }
 
         // Step5: 构建响应体
         ProductUpdateResponse response = new ProductUpdateResponse();
         BeanUtils.copyProperties(product, response);
+        System.out.println("Response Body: " + response);
         return ResponseBuilder.ok(response);
     }
 
@@ -119,6 +141,9 @@ public class ProductController {
             @RequestHeader("Authorization") String tokenHeader,
             @RequestBody ProductUpdateRequest request
     ) {
+        System.out.println("=== Update Status Request ===");
+        System.out.println("Request Body: " + request);
+
         Long productId = request.getId();
         int status = request.getStatus();
 
@@ -126,9 +151,11 @@ public class ProductController {
         boolean success = productService.updateProductStatus(productId, status);
 
         // Step2: 返回操作结果
-        return success ?
+        CommonResponse response = success ?
                 ResponseBuilder.ok("商品状态更新成功") :
                 ResponseBuilder.fail("状态更新失败");
+        System.out.println("Response Body: " + response);
+        return response;
     }
 
     @PostMapping("/delete")
@@ -136,6 +163,9 @@ public class ProductController {
             @RequestHeader("Authorization") String tokenHeader,
             @RequestBody ProductDeleteRequest request
     ) {
+        System.out.println("=== Delete Product Request ===");
+        System.out.println("Request Body: " + request);
+
         // Step1: 从请求体中获取商品ID
         Long productId = request.getId();
 
@@ -143,8 +173,10 @@ public class ProductController {
         boolean success = productService.deleteProduct(productId);
 
         // Step3: 返回操作结果
-        return success ?
+        CommonResponse response = success ?
                 ResponseBuilder.ok("商品删除成功") :
                 ResponseBuilder.fail("删除失败，商品可能不存在");
+        System.out.println("Response Body: " + response);
+        return response;
     }
 }
