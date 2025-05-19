@@ -76,7 +76,7 @@ public class MerchantController {
 
         // Step4: 生成JWT令牌
         String token = JwtUtils.createToken(result.getId(), "merchant", result.getUsername());
-        redisTemplate.opsForValue().set("rider:token:" + token, result.getId(), 1, TimeUnit.DAYS);
+        redisTemplate.opsForValue().set("merchant:token:" + token, result.getId(), 1, TimeUnit.DAYS);
         redisTemplate.opsForValue().set(loginKey, token, 1, TimeUnit.DAYS);
 
         // Step5: 构建登录响应
