@@ -94,7 +94,7 @@ public class MerchantController {
     }
 
     @GetMapping("/info")
-    public CommonResponse getInfo() {
+    public CommonResponse getInfo(@RequestHeader("Authorization") String tokenHeader) {
         System.out.println("收到获取信息请求");
 
         // Step1: 从线程上下文获取用户ID
