@@ -13,4 +13,5 @@ public class MerchantUpdateResponse {
     private String username;
     private String phone;
     private String avatar;
+    private String token;
 }

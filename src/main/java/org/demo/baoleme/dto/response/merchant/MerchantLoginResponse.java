@@ -10,5 +10,5 @@ import lombok.Data;
 public class MerchantLoginResponse {
     private String token;
     private Long userId;
-    private Long expiresIn = 86400L;
+    private long expiresIn = 1000 * 60 * 60 * 24;
 }

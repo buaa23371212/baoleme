@@ -50,11 +50,15 @@ public class MerchantController {
         response.setUserId(result.getId());
         response.setUsername(result.getUsername());
         response.setPhone(result.getPhone());
+
+        System.out.println("注册成功，响应: " + ResponseBuilder.ok(response));
         return ResponseBuilder.ok(response);
     }
 
     @PostMapping("/login")
     public CommonResponse login(@RequestBody MerchantLoginRequest request) {
+        System.out.println("收到登录请求: " + request);
+
         // Step1: 根据用户名查询商家
         Merchant result = merchantService.getMerchantByUsername(request.getUsername());
 
@@ -84,11 +88,15 @@ public class MerchantController {
         MerchantLoginResponse response = new MerchantLoginResponse();
         response.setToken(token);
         response.setUserId(result.getId());
+
+        System.out.println("登录成功，响应: " + response);
         return ResponseBuilder.ok(response);
     }
 
     @GetMapping("/info")
     public CommonResponse getInfo() {
+        System.out.println("收到获取信息请求");
+
         // Step1: 从线程上下文获取用户ID
         Long id = UserHolder.getId();
 
@@ -104,52 +112,88 @@ public class MerchantController {
         MerchantInfoResponse response = new MerchantInfoResponse();
         BeanUtils.copyProperties(merchant, response);
         response.setUserId(merchant.getId());
+
+        System.out.println("获取信息成功，响应: " + response);
         return ResponseBuilder.ok(response);
     }
 
     @PutMapping("/update")
     public CommonResponse update(@RequestBody MerchantUpdateRequest request,
                                  @RequestHeader("Authorization") String tokenHeader) {
-        // Step1: 创建Merchant对象并设置ID
-        Merchant merchant = new Merchant();
-        merchant.setId(UserHolder.getId());
+        System.out.println("收到更新请求: " + request);
 
-        // Step2: 拷贝请求参数
-        BeanUtils.copyProperties(request, merchant);
+        // Step1: 创建Merchant对象并设置用户ID
+        Merchant oldMerchant = new Merchant();
+        Long id = UserHolder.getId();
+        oldMerchant.setId(id);
 
-        // Step3: 调用Service更新数据
-        Merchant m = merchantService.updateInfo(merchant);
+        // Step2: 拷贝请求参数到实体对象
+        BeanUtils.copyProperties(request, oldMerchant);
 
-        // Step4: 处理更新结果
-        boolean success = (m != null);
-        return success ? ResponseBuilder.ok() : ResponseBuilder.fail("更新失败，请检查请求字段");
+        // Step3: 调用Service执行更新操作
+        Merchant newMerchant = merchantService.updateInfo(oldMerchant);
+
+        // Step4: 处理更新失败情况
+        if (newMerchant == null) {
+            return ResponseBuilder.fail("更新失败，请检查字段");
+        }
+
+        // Step5: 构建基础响应体
+        MerchantUpdateResponse response = new MerchantUpdateResponse();
+        response.setUsername(request.getUsername());
+        response.setUserId(id);
+
+        // Step6: 检查用户名是否发生变更
+        boolean usernameChanged = request.getUsername() != null
+                && !request.getUsername().equals(newMerchant.getUsername());
+        if (!usernameChanged) {
+            return ResponseBuilder.ok(response);  // 用户名未修改直接返回
+        }
+
+        // Step7: 清理旧Token相关缓存
+        String oldToken = tokenHeader.replace("Bearer ", "");
+        redisTemplate.delete("merchant:token:" + oldToken);
+        redisTemplate.delete("merchant:login:" + id);
+
+        // Step8: 生成新Token并更新缓存
+        String newToken = JwtUtils.createToken(id, "merchant", request.getUsername());
+        redisTemplate.opsForValue().set("merchant:token:" + newToken, id, 1, TimeUnit.DAYS);
+        redisTemplate.opsForValue().set("merchant:login:" + id, newToken, 1, TimeUnit.DAYS);
+
+        // Step9: 设置响应中的新Token
+        response.setToken(newToken);
+
+        System.out.println("更新成功，响应: " + response);
+        return ResponseBuilder.ok(response);
     }
 
     @PostMapping("/logout")
     public CommonResponse logout(@RequestHeader("Authorization") String tokenHeader) {
+        System.out.println("收到登出请求，Token: " + tokenHeader);
+
+        // Step1: 解析并提取原始Token
         String token = tokenHeader.replace("Bearer ", "");
         String tokenKey = "merchant:token:" + token;
 
+        // Step2: 获取并删除关联的登录状态
         Object merchantId = redisTemplate.opsForValue().get(tokenKey);
         if (merchantId != null) {
             String loginKey = "merchant:login:" + merchantId;
-            redisTemplate.delete(loginKey);       // ✅ 删除登录标识
+            redisTemplate.delete(loginKey);
         }
 
-        redisTemplate.delete(tokenKey);          // ✅ 删除 token 本体
+        // Step3: 删除Token本体
+        redisTemplate.delete(tokenKey);
 
-        // 设置为离线
-        Long id = UserHolder.getId();
-        Merchant merchant = new Merchant();
-        merchant.setId(id);
-
-        boolean success = (merchantService.updateInfo(merchant) != null);
-        return success ? ResponseBuilder.ok() : ResponseBuilder.fail("登出失败");
+        // Step4: 返回操作结果
+        return ResponseBuilder.ok();
     }
 
     @DeleteMapping("/delete")
-    public CommonResponse delete() {
-        // Step1: 获取当前用户ID
+    public CommonResponse delete(@RequestHeader("Authorization") String tokenHeader) {
+        System.out.println("收到删除请求");
+
+        // Step1: 获取当前认证用户ID
         Long id = UserHolder.getId();
 
         // Step2: 执行删除操作

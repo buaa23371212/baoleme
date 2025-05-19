@@ -83,7 +83,17 @@ public class MerchantServiceImpl implements MerchantService {
         Merchant existing = merchantMapper.selectById(merchant.getId());
         if (existing == null) return null;
 
-        // Step3: 字段非空则更新。密码加密
+        // Step3: 用户名重复校验
+        // 当新用户名非空且与原用户名不同时，检查是否被其他商户占用
+        if (StringUtils.hasText(merchant.getUsername())
+                && !existing.getUsername().equals(merchant.getUsername())) {
+            Merchant conflictMerchant = merchantMapper.selectByUsername(merchant.getUsername());
+            if (conflictMerchant != null) {
+                return null; // 用户名已被占用
+            }
+        }
+
+        // Step4: 字段非空则更新。密码加密
         if (StringUtils.hasText(merchant.getUsername())) {
             existing.setUsername(merchant.getUsername());
         }
@@ -94,8 +104,8 @@ public class MerchantServiceImpl implements MerchantService {
             existing.setPhone(merchant.getPhone());
         }
 
-        // Step4: 更新至数据库，并返回结果
-        merchantMapper.updateMerchant(merchant);
+        // Step5: 更新至数据库，并返回结果
+        merchantMapper.updateMerchant(existing);
         return merchantMapper.selectById(merchant.getId());
     }
 
