@@ -114,7 +114,7 @@ public class ProductController {
 
         // Step1: 创建 Product 对象并设置 ID
         Product product = new Product();
-        product.setId(request.getId());
+        product.setId(request.getProductId());
 
         // Step2: 拷贝请求参数
         // 可能会出现属性拷贝后数据类型不匹配的情况
@@ -145,7 +145,7 @@ public class ProductController {
         System.out.println("=== Update Status Request ===");
         System.out.println("Request Body: " + request);
 
-        Long productId = request.getId();
+        Long productId = request.getProductId();
         int status = request.getStatus();
 
         // Step1: 执行状态更新
