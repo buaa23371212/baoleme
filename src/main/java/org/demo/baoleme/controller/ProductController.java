@@ -89,6 +89,7 @@ public class ProductController {
         Long storeId = request.getStoreId();
 
         // Step2: 查询店铺商品列表
+        // TODO: Page?
         List<Product> products = productService.getProductsByStore(storeId);
 
         // Step3: 构建响应体
