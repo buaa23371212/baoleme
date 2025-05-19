@@ -1,6 +1,8 @@
 package org.demo.baoleme.pojo;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -8,11 +10,11 @@ import java.time.LocalDateTime;
 
 @Data
 @TableName("store")
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Store {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    @TableField("merchant_id")
     private Long merchantId;
 
     private String name;
@@ -24,14 +26,14 @@ public class Store {
     /**
      * 评分（decimal(2,1), 默认5.0）
      */
+    // TODO: 我默认值呢？
     private BigDecimal rating;
 
     /**
      * 状态（1-开启，0-关闭）
      */
-    private int status = 0;
+    private int status;
 
-    @TableField(value = "created_at", fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 
     private String image;
