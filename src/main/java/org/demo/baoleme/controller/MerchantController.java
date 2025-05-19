@@ -108,7 +108,8 @@ public class MerchantController {
     }
 
     @PutMapping("/update")
-    public CommonResponse update(@RequestBody MerchantUpdateRequest request) {
+    public CommonResponse update(@RequestBody MerchantUpdateRequest request,
+                                 @RequestHeader("Authorization") String tokenHeader) {
         // Step1: 创建Merchant对象并设置ID
         Merchant merchant = new Merchant();
         merchant.setId(UserHolder.getId());

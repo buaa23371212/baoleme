@@ -70,7 +70,7 @@ public class MerchantServiceImpl implements MerchantService {
 
     /* 更新版块 */
     /**
-     * 更新数据库
+     * 更新商家数据库。通过id查找需更新的商家
      * @param merchant 新商家
      * @return 更新后的merchant实例 或 null，如果更新失败
      */
