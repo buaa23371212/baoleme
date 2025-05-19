@@ -3,7 +3,9 @@ package org.demo.baoleme.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import org.demo.baoleme.mapper.ProductMapper;
+import org.demo.baoleme.mapper.StoreMapper;
 import org.demo.baoleme.pojo.Product;
+import org.demo.baoleme.pojo.Store;
 import org.demo.baoleme.service.ProductService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +16,14 @@ import java.util.List;
 @Service
 public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
+    private final StoreMapper storeMapper;
 
-    public ProductServiceImpl(ProductMapper productMapper) {
+    public ProductServiceImpl(
+            ProductMapper productMapper,
+            StoreMapper storeMapper
+    ) {
         this.productMapper = productMapper;
+        this.storeMapper = storeMapper;
     }
 
     @Override

@@ -17,21 +17,11 @@ public interface ProductMapper extends BaseMapper<Product> {
     @Select("SELECT * FROM product WHERE store_id = #{storeId}")
     List<Product> selectByStoreId(Long storeId);
 
-    /**
-     * 更新商品信息
-     * @param product 商品对象
-     * @return 受影响的行数
-     */
-    @Update("UPDATE product SET name=#{name}, description=#{description}, price=#{price}, " +
-            "category=#{category}, stock=#{stock}, rating=#{rating}, status=#{status}, " +
-            "image=#{image}, store_id=#{storeId} WHERE id = #{id}")
-    int updateProduct(Product product);
-
     @Delete("""
     DELETE FROM product 
     WHERE name = #{productName} 
     AND store_id = (SELECT id FROM store WHERE name = #{storeName} LIMIT 1)
-""")
+    """)
     int deleteByNameAndStore(@Param("productName") String productName,
                              @Param("storeName") String storeName);
 }
