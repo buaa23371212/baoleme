@@ -35,4 +35,7 @@ public interface SaleMapper extends BaseMapper<Sale> {
                                        @Param("format") String dateFormat,
                                        @Param("start") LocalDate start,
                                        @Param("end") LocalDate end);
+
+    @Select("SELECT COUNT(DISTINCT id) FROM sales WHERE store_id = #{storeId} AND sale_date BETWEEN #{start} AND #{end}")
+    int getOrderCount(@Param("storeId") Long storeId, @Param("start") LocalDate start, @Param("end") LocalDate end);
 }

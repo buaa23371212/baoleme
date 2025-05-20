@@ -7,6 +7,7 @@ import org.demo.baoleme.pojo.Product;
 import org.demo.baoleme.service.SalesStatsService;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,7 +29,7 @@ public class StatsController {
         LocalDate endDate = dateRange[1];
 
         // Step 2: 调用服务层获取实际数据
-        double totalSales = salesStatsService.getTotalSales(request.getStoreId(), startDate, endDate);
+        BigDecimal totalSales = salesStatsService.getTotalSales(request.getStoreId(), startDate, endDate);
         int orderCount = salesStatsService.getOrderCount(request.getStoreId(), startDate, endDate);
         List<Product> popularProducts = salesStatsService.getPopularProducts(request.getStoreId(), startDate, endDate);
 

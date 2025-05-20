@@ -2,7 +2,9 @@ package org.demo.baoleme.service.impl;
 
 import org.demo.baoleme.dto.request.salesStats.SaleTrendStatsRequest;
 import org.demo.baoleme.dto.response.salesStats.SaleTrendData;
+import org.demo.baoleme.mapper.ProductMapper;
 import org.demo.baoleme.mapper.SaleMapper;
+import org.demo.baoleme.pojo.Product;
 import org.demo.baoleme.service.SalesStatsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,8 +17,10 @@ import java.util.List;
 public class SalesStatsServiceImpl implements SalesStatsService {
 
     private final SaleMapper saleMapper;
+    private final ProductMapper productMapper;
 
-    public SalesStatsServiceImpl(SaleMapper saleMapper) {
+    public SalesStatsServiceImpl(SaleMapper saleMapper, ProductMapper productMapper) {
+        this.productMapper = productMapper;
         this.saleMapper = saleMapper;
     }
 
@@ -60,5 +64,19 @@ public class SalesStatsServiceImpl implements SalesStatsService {
             case BY_WEEK -> "%Y-%u";    // 示例：2023-40（第40周）
             case BY_MONTH -> "%Y-%m";   // 示例：2023-10
         };
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public int getOrderCount(Long storeId, LocalDate startDate, LocalDate endDate) {
+        // 假设 SaleMapper 中有获取订单数量的方法
+        return saleMapper.getOrderCount(storeId, startDate, endDate);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Product> getPopularProducts(Long storeId, LocalDate startDate, LocalDate endDate) {
+        // 由于未定义 popularProduct，这里返回所有商品
+        return productMapper.selectByStoreId(storeId);
     }
 }
