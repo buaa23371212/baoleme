@@ -80,12 +80,12 @@ public class ReviewController {
     private List<ReviewReadResponse> convertToResponse(List<Review> reviews) {
         return reviews.stream().map(review -> {
             ReviewReadResponse response = new ReviewReadResponse();
-            // TODO: 使用占位符
-            response.setUsername(review.getUser().getName());
+            // 使用占位符处理用户信息
+            response.setUsername("用户" + review.getUserId()); // 用户ID占位
             response.setRating(review.getRating());
             response.setComment(review.getComment());
             response.setCreatedAt(review.getCreatedAt());
-            response.setUserAvatar(review.getUser().getAvatar());
+            response.setUserAvatar(""); // 空头像
             response.setImage(review.getImage());
             return response;
         }).collect(Collectors.toList());
