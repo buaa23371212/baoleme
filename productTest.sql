@@ -1,0 +1,1 @@
+INSERT INTO product (store_id, name, price) VALUES (50000001, '奈鹏', 581.50);
