@@ -74,4 +74,24 @@ public class OrderServiceImpl implements OrderService {
     public Order getOrderById(Long orderId) {
         return orderMapper.selectById(orderId);
     }
+
+    @Override
+    public boolean updateOrderByMerchant(Long orderId, Long storeId, Integer newStatus, String cancelReason) {
+        // Step 1: 查询订单当前状态和店铺ID
+        Order order = orderMapper.selectById(orderId);
+        if (order == null || !order.getStoreId().equals(storeId)) {
+            return false; // 订单不存在或店铺不匹配
+        }
+
+        // Step 2: 执行更新操作（包含状态和取消原因）
+        int rowsUpdated = orderMapper.updateByMerchant(
+                orderId,
+                storeId,
+                newStatus,
+                cancelReason
+        );
+
+        // Step 3: 返回更新结果
+        return rowsUpdated > 0;
+    }
 }

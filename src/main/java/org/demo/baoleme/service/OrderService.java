@@ -41,4 +41,6 @@ public interface OrderService {
      * 查询单个订单
      */
     Order getOrderById(Long orderId);
+
+    boolean updateOrderByMerchant(Long orderId, Long storeId, Integer newStatus, String cancelReason);
 }

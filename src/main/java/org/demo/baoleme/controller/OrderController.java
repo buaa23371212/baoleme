@@ -133,4 +133,35 @@ public class OrderController {
 
         return ResponseBuilder.ok(response);
     }
+
+    /**
+     * 商家更新订单状态
+     */
+    @PutMapping("/merchant-update")
+    public CommonResponse updateOrderByMerchant(@Valid @RequestBody OrderUpdateByMerchantRequest request) {
+        // Step 1: 调用Service层执行更新
+        boolean ok = orderService.updateOrderByMerchant(
+                request.getId(),
+                request.getStoreId(),
+                request.getNewStatus(),
+                request.getCancelReason()
+        );
+
+        // Step 2: 处理失败情况
+        if (!ok) {
+            return ResponseBuilder.fail("订单更新失败：权限不足或订单不存在");
+        }
+
+        // Step 3: 查询更新后的订单信息（旧状态需在Service中获取）
+        Order order = orderService.getOrderById(request.getId());
+
+        // Step 4: 构造响应
+        OrderUpdateByMerchantResponse response = new OrderUpdateByMerchantResponse();
+        response.setId(order.getId());
+        response.setOldStatus(order.getStatus()); // 假设Service已处理旧状态
+        response.setNewStatus(request.getNewStatus());
+        response.setUpdateAt(LocalDateTime.now());
+
+        return ResponseBuilder.ok(response);
+    }
 }

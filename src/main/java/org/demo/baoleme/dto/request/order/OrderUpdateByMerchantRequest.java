@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 public class OrderUpdateByMerchantRequest {
     private Long id;
+    private Long storeId;
     private Integer newStatus;
     private String cancelReason;
 }
