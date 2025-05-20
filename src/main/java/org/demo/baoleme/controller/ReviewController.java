@@ -4,6 +4,7 @@ import org.demo.baoleme.common.CommonResponse;
 import org.demo.baoleme.common.ResponseBuilder;
 import org.demo.baoleme.dto.request.review.ReviewReadRequest;
 import org.demo.baoleme.dto.response.review.ReviewReadResponse;
+import org.demo.baoleme.pojo.Page;
 import org.demo.baoleme.pojo.Review;
 import org.demo.baoleme.service.ReviewService;
 import org.springframework.web.bind.annotation.*;
@@ -58,8 +59,8 @@ public class ReviewController {
             }
         }
 
-        // Step3: 查询符合条件的评论（包含分页和图片过滤）
-        List<Review> reviews = reviewService.getFilteredReviews(
+        // Step3: 查询符合条件的评论（返回Page对象）
+        Page<Review> reviewPage = reviewService.getFilteredReviews(
                 storeId,
                 min,
                 max,
@@ -68,11 +69,11 @@ public class ReviewController {
                 request.getPageSize()
         );
 
-        // Step4: 转换为响应体
-        List<ReviewReadResponse> responses = convertToResponse(reviews);
+        // Step4: 转换为响应体（包含分页信息）
+        Page<ReviewReadResponse> responsePage = convertToResponsePage(reviewPage);
 
         // Step5: 返回结果
-        return ResponseBuilder.ok(responses);
+        return ResponseBuilder.ok(responsePage);
     }
 
     // 辅助方法：将Review转换为ReviewReadResponse

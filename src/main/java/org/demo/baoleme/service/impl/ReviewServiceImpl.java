@@ -2,6 +2,7 @@ package org.demo.baoleme.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.demo.baoleme.mapper.ReviewMapper;
+import org.demo.baoleme.pojo.Page;
 import org.demo.baoleme.pojo.Review;
 import org.demo.baoleme.service.ReviewService;
 import org.springframework.stereotype.Service;
@@ -66,7 +67,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Review> getFilteredReviews(
+    public Page<Review> getFilteredReviews(
             Long storeId,
             Integer minRating,
             Integer maxRating,
@@ -74,27 +75,47 @@ public class ReviewServiceImpl implements ReviewService {
             int page,
             int pageSize
     ) {
-        // Step1: 构建分页对象（MyBatis-Plus页码从1开始）
-        Page<Review> pageObj = new Page<>(page, pageSize);
-
-        // Step2: 构建查询条件
+        // Step1: 构建查询条件（不包含分页）
         LambdaQueryWrapper<Review> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Review::getStoreId, storeId);
 
-        // 评分范围条件
         if (minRating != null && maxRating != null) {
             wrapper.between(Review::getRating, minRating, maxRating);
         }
 
-        // 图片过滤条件
         if (hasImage != null && hasImage) {
             wrapper.isNotNull(Review::getImage);
         }
 
-        // Step3: 执行分页查询
-        Page<Review> resultPage = reviewMapper.selectPage(pageObj, wrapper);
+        // Step2: 查询总记录数
+        int totalCount = reviewMapper.selectCount(wrapper).intValue();
 
-        // Step4: 返回当前页数据
-        return resultPage.getRecords();
+        // Step3: 计算总页数
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+
+        // Step4: 修正非法页码
+        if (page < 1) page = 1;
+        if (page > totalPages && totalPages > 0) page = totalPages;
+
+        // Step5: 计算分页偏移量
+        int offset = (page - 1) * pageSize;
+        wrapper.last("LIMIT " + pageSize + " OFFSET " + offset);
+
+        // Step6: 执行分页查询
+        List<Review> records = reviewMapper.selectList(wrapper);
+
+        // Step7: 构建自定义分页对象
+        Page<Review> resultPage = new Page<>();
+        resultPage.setCurrPage(page);
+        resultPage.setPageSize(pageSize);
+        resultPage.setCount(totalCount);
+        resultPage.setPageCount(totalPages);
+        resultPage.setList(records);
+
+        // Step8: 计算相邻页码
+        if (page > 1) resultPage.setPrePage(page - 1);
+        if (page < totalPages) resultPage.setNextPage(page + 1);
+
+        return resultPage;
     }
 }

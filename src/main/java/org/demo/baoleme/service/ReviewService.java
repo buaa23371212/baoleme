@@ -1,5 +1,6 @@
 package org.demo.baoleme.service;
 
+import org.demo.baoleme.pojo.Page;
 import org.demo.baoleme.pojo.Review;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public interface ReviewService {
      */
     List<Review> getReviewsByRatingRange(Integer minRating, Integer maxRating);
 
-    List<Review> getFilteredReviews(
+    Page<Review> getFilteredReviews(
             Long storeId,
             Integer minRating,
             Integer maxRating,
