@@ -17,6 +17,22 @@ public interface ProductMapper extends BaseMapper<Product> {
     @Select("SELECT * FROM product WHERE store_id = #{storeId}")
     List<Product> selectByStoreId(Long storeId);
 
+    // 新增分页查询方法
+    @Select("""
+        SELECT * FROM product 
+        WHERE store_id = #{storeId} 
+        LIMIT #{pageSize} OFFSET #{offset}
+    """)
+    List<Product> selectByStore(
+            @Param("storeId") Long storeId,
+            @Param("offset") int offset,
+            @Param("pageSize") int pageSize
+    );
+
+    // 新增总数统计方法
+    @Select("SELECT COUNT(*) FROM product WHERE store_id = #{storeId}")
+    int countByStore(@Param("storeId") Long storeId);
+
     @Delete("""
     DELETE FROM product 
     WHERE name = #{productName} 

@@ -1,7 +1,7 @@
 package org.demo.baoleme.service;
 
+import org.demo.baoleme.pojo.Page;
 import org.demo.baoleme.pojo.Product;
-import java.util.List;
 
 public interface ProductService {
 
@@ -24,7 +24,7 @@ public interface ProductService {
      * @param storeId 店铺ID
      * @return 商品列表
      */
-    List<Product> getProductsByStore(Long storeId);
+    Page<Product> getProductsByStore(Long storeId, int page, int pageSize);
 
     /**
      * 更新商品信息

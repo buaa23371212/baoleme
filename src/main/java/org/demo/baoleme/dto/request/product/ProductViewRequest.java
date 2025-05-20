@@ -9,6 +9,6 @@ public class ProductViewRequest {
     private Long storeId;
     private String category;
     private Integer status;
-    private int page;
-    private int pageSize;
+    private int page = 1;   // 默认值
+    private int pageSize = 10;
 }

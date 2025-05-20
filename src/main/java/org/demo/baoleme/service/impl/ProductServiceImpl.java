@@ -1,16 +1,12 @@
 package org.demo.baoleme.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import org.demo.baoleme.mapper.ProductMapper;
-import org.demo.baoleme.mapper.StoreMapper;
-import org.demo.baoleme.pojo.Product;
-import org.demo.baoleme.pojo.Store;
+import org.demo.baoleme.mapper.*;
+import org.demo.baoleme.pojo.*;
 import org.demo.baoleme.service.ProductService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -60,17 +56,36 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Product> getProductsByStore(Long storeId) {
+    public Page<Product> getProductsByStore(Long storeId, int currentPage, int pageSize) {
         // Step1: 校验storeId是否为空
         if (storeId == null) {
-            return Collections.emptyList();
+            System.out.println("警告：店铺ID为空");
+            return new Page<>();
         }
 
-        // Step2: 查询店铺商品列表
-        return productMapper.selectList(
-                new LambdaQueryWrapper<Product>()
-                        .eq(Product::getStoreId, storeId)
-        );
+        // Step1: 创建分页对象
+        Page<Product> page = new Page<>();
+        page.setCurrPage(currentPage);
+        page.setPageSize(pageSize);
+
+        // Step2: 计算偏移量
+        int offset = (currentPage - 1) * pageSize;
+
+        // Step3: 查询数据
+        List<Product> products = productMapper.selectByStore(storeId, offset, pageSize);
+        int totalCount = productMapper.countByStore(storeId);
+
+        // Step4: 计算分页信息
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+
+        // Step5: 填充分页对象
+        page.setList(products);
+        page.setCount(totalCount);
+        page.setPageCount(totalPages);
+        page.setPrePage(currentPage > 1 ? currentPage - 1 : null);
+        page.setNextPage(currentPage < totalPages ? currentPage + 1 : null);
+
+        return page;
     }
 
     @Override

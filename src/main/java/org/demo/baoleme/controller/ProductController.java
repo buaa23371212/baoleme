@@ -4,9 +4,11 @@ import org.demo.baoleme.common.CommonResponse;
 import org.demo.baoleme.common.ResponseBuilder;
 import org.demo.baoleme.dto.request.product.*;
 import org.demo.baoleme.dto.response.product.*;
+import org.demo.baoleme.pojo.Page;
 import org.demo.baoleme.pojo.Product;
 import org.demo.baoleme.service.ProductService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +20,7 @@ public class ProductController {
 
     private final ProductService productService;
 
+    @Autowired
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
@@ -87,13 +90,14 @@ public class ProductController {
         System.out.println("Request Body: " + request);
 
         Long storeId = request.getStoreId();
+        int currentPage = request.getPage();       // 新增页码参数
+        int pageSize = request.getPageSize(); // 新增分页大小参数
 
-        // Step2: 查询店铺商品列表
-        // TODO: Page?
-        List<Product> products = productService.getProductsByStore(storeId);
+        // Step2: 调用Service获取分页数据
+        Page<Product> page = productService.getProductsByStore(storeId, currentPage, pageSize);
 
-        // Step3: 构建响应体
-        List<ProductViewResponse> responses = products.stream()
+        // Step3: 构建响应列表
+        List<ProductViewResponse> responses = page.getList().stream()
                 .map(product -> {
                     ProductViewResponse resp = new ProductViewResponse();
                     BeanUtils.copyProperties(product, resp);
@@ -101,8 +105,15 @@ public class ProductController {
                 })
                 .collect(Collectors.toList());
 
-        System.out.println("Response Body: " + responses);
-        return ResponseBuilder.ok(responses);
+        // Step4: 封装分页响应
+        ProductPageResponse pageResponse = new ProductPageResponse();
+        pageResponse.setProducts(responses);
+        pageResponse.setCurrentPage(page.getCurrPage());
+        pageResponse.setTotalPages(page.getPageCount());
+        pageResponse.setTotalItems(page.getCount());
+
+        System.out.println("Response Body: " + pageResponse);
+        return ResponseBuilder.ok(pageResponse);
     }
 
     @PutMapping("/update")
