@@ -138,7 +138,15 @@ public class OrderController {
      * 商家更新订单状态
      */
     @PutMapping("/merchant-update")
-    public CommonResponse updateOrderByMerchant(@Valid @RequestBody OrderUpdateByMerchantRequest request) {
+    public CommonResponse updateOrderByMerchant(
+
+            @Valid @RequestBody OrderUpdateByMerchantRequest request
+    ) {
+        Order order = orderService.getOrderById(request.getId());
+        if (order.getStatus() != 1) {
+            return ResponseBuilder.fail("订单更新失败：当前状态商家无权更新");
+        }
+
         // Step 1: 调用Service层执行更新
         boolean ok = orderService.updateOrderByMerchant(
                 request.getId(),
@@ -153,12 +161,12 @@ public class OrderController {
         }
 
         // Step 3: 查询更新后的订单信息（旧状态需在Service中获取）
-        Order order = orderService.getOrderById(request.getId());
+        Order newOrder = orderService.getOrderById(request.getId());
 
         // Step 4: 构造响应
         OrderUpdateByMerchantResponse response = new OrderUpdateByMerchantResponse();
-        response.setId(order.getId());
-        response.setOldStatus(order.getStatus()); // 假设Service已处理旧状态
+        response.setId(newOrder.getId());
+        response.setOldStatus(newOrder.getStatus()); // 假设Service已处理旧状态
         response.setNewStatus(request.getNewStatus());
         response.setUpdateAt(LocalDateTime.now());
         response.setCancelReason(request.getCancelReason());

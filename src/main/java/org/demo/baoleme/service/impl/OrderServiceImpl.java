@@ -83,7 +83,9 @@ public class OrderServiceImpl implements OrderService {
             return false; // 订单不存在或店铺不匹配
         }
 
-        // Step 2: 执行更新操作（包含状态和取消原因）
+        // TODO: 未过滤空值
+
+        // Step 2: 执行更新操作
         int rowsUpdated = orderMapper.updateByMerchant(
                 orderId,
                 storeId,
