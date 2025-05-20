@@ -83,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> getOrdersByMerchant(Long storeId, Integer status, int page, int pageSize) {
         int offset = (page - 1) * pageSize;
-        return orderMapper.selectByStoreIdWithStatus(storeId, status, offset, pageSize);
+        return orderMapper.selectByStoreIdUsingPage(storeId, offset, pageSize);
     }
 
     @Override
