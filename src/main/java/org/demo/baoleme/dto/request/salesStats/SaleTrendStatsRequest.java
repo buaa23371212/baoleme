@@ -7,7 +7,7 @@ import lombok.Data;
 public class SaleTrendStatsRequest {
     private Long storeId;
     private TimeAxis type;
-    private int numOfRecentDays;
+    private int numOfRecentDays = 30;
 
     public enum TimeAxis {
         BY_DAY(0),

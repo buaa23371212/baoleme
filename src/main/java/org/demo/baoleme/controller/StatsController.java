@@ -22,7 +22,10 @@ public class StatsController {
     }
 
     @PostMapping("/overview")
-    public SaleOverviewStatsResponse getSalesOverview(@Valid @RequestBody SaleOverviewStatsRequest request) {
+    public SaleOverviewStatsResponse getSalesOverview(
+            @RequestHeader("Authorization") String tokenHeader,
+            @Valid @RequestBody SaleOverviewStatsRequest request
+    ) {
         // Step 1: 解析时间范围
         LocalDate[] dateRange = resolveTimeRange(request.getTimeRange());
         LocalDate startDate = dateRange[0];
@@ -43,7 +46,10 @@ public class StatsController {
     }
 
     @PostMapping("/trend")
-    public SaleTrendStatsResponse getSalesTrend(@Valid @RequestBody SaleTrendStatsRequest request) {
+    public SaleTrendStatsResponse getSalesTrend(
+            @RequestHeader("Authorization") String tokenHeader,
+            @Valid @RequestBody SaleTrendStatsRequest request
+    ) {
         // Step 1: 调用服务层获取趋势数据
         List<SaleTrendData> trendData = salesStatsService.getSalesTrend(
                 request.getStoreId(),

@@ -32,7 +32,7 @@ public interface SaleMapper extends BaseMapper<Sale> {
             "FROM sales WHERE store_id = #{storeId} AND sale_date BETWEEN #{start} AND #{end} " +
             "GROUP BY date_label ORDER BY date_label")
     List<SaleTrendData> findSalesTrend(@Param("storeId") Long storeId,
-                                       @Param("format") String dateFormat,
+                                       @Param("format") String format,
                                        @Param("start") LocalDate start,
                                        @Param("end") LocalDate end);
 
