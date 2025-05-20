@@ -3,7 +3,11 @@ package org.demo.baoleme.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.demo.baoleme.dto.response.salesStats.SaleTrendData;
 import org.demo.baoleme.pojo.Sale;
+import org.springframework.data.repository.query.Param;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -18,4 +22,17 @@ public interface SaleMapper extends BaseMapper<Sale> {
      */
     @Select("SELECT * FROM sales WHERE store_id = #{storeId} AND sale_date >= #{saleDate}")
     List<Sale> selectSalesByStoreIdAndDateAfter(Long storeId, LocalDate saleDate);
+
+    @Select("SELECT SUM(total_amount) FROM sales WHERE store_id = #{storeId} AND sale_date BETWEEN #{start} AND #{end}")
+    BigDecimal sumTotalAmountByStoreAndDate(@Param("storeId") Long storeId,
+                                            @Param("start") LocalDate start,
+                                            @Param("end") LocalDate end);
+
+    @Select("SELECT DATE_FORMAT(sale_date, #{format}) AS date_label, SUM(total_amount) AS value " +
+            "FROM sales WHERE store_id = #{storeId} AND sale_date BETWEEN #{start} AND #{end} " +
+            "GROUP BY date_label ORDER BY date_label")
+    List<SaleTrendData> findSalesTrend(@Param("storeId") Long storeId,
+                                       @Param("format") String dateFormat,
+                                       @Param("start") LocalDate start,
+                                       @Param("end") LocalDate end);
 }

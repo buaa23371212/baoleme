@@ -53,6 +53,7 @@ public class SaleServiceImpl implements SaleService {
         return saleMapper.selectList(
                 new LambdaQueryWrapper<Sale>()
                         .eq(Sale::getStoreId, storeId)
+                        .apply("USE INDEX (idx_store_id)") // 强制使用索引
         );
     }
 }
