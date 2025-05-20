@@ -3,7 +3,11 @@ apifox测试
 ctrl+F5清除浏览器缓存
 请求方式表示动作
 
-√ 请求体，返回体
-mapper
-service
-controller
+requestbody,responsebody + 终断输出
+主键唯一键非空键检查
+Step注解
+
+新建CouponPageResponse，使用Page，对查询结果进行分页
+完成CouponController，处理请求，给出应答
+在每个方法最前面给出请求的控制台输出，末尾给出应答的控制台输出
+使用类似Step的注释风格
