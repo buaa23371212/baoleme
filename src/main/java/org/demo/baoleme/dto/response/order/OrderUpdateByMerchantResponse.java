@@ -13,4 +13,5 @@ public class OrderUpdateByMerchantResponse {
     private Integer oldStatus;
     private Integer newStatus;
     private LocalDateTime updateAt;
+    private String cancelReason;
 }

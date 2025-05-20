@@ -85,7 +85,6 @@ public interface OrderMapper extends BaseMapper<Order> {
     int updateByMerchant(
             @Param("orderId") Long orderId,
             @Param("storeId") Long storeId,
-            @Param("newStatus") Integer newStatus,
-            @Param("cancelReason") String cancelReason
+            @Param("newStatus") Integer newStatus
     );
 }

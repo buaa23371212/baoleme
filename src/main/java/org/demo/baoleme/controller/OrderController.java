@@ -161,6 +161,7 @@ public class OrderController {
         response.setOldStatus(order.getStatus()); // 假设Service已处理旧状态
         response.setNewStatus(request.getNewStatus());
         response.setUpdateAt(LocalDateTime.now());
+        response.setCancelReason(request.getCancelReason());
 
         return ResponseBuilder.ok(response);
     }

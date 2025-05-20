@@ -87,8 +87,7 @@ public class OrderServiceImpl implements OrderService {
         int rowsUpdated = orderMapper.updateByMerchant(
                 orderId,
                 storeId,
-                newStatus,
-                cancelReason
+                newStatus
         );
 
         // Step 3: 返回更新结果
