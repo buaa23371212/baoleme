@@ -79,6 +79,7 @@ public class ReviewController {
     private List<ReviewReadResponse> convertToResponse(List<Review> reviews) {
         return reviews.stream().map(review -> {
             ReviewReadResponse response = new ReviewReadResponse();
+            // TODO: 使用占位符
             response.setUsername(review.getUser().getName());
             response.setRating(review.getRating());
             response.setComment(review.getComment());
