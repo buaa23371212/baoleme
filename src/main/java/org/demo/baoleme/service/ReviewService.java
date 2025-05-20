@@ -2,6 +2,8 @@ package org.demo.baoleme.service;
 
 import org.demo.baoleme.pojo.Page;
 import org.demo.baoleme.pojo.Review;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 public interface ReviewService {
@@ -57,4 +59,7 @@ public interface ReviewService {
             int page,
             int pageSize
     );
+
+    @Transactional(readOnly = true)
+    Page<Review> getStoreReviewsPage(Long storeId, int page, int pageSize);
 }

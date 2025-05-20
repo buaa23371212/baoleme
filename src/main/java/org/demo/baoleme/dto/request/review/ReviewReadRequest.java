@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class ReviewReadRequest {
+    private Long storeId;
     private int page;
     private int pageSize;
     private ReviewFilterType type;

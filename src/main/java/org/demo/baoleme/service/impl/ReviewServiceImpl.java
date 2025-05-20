@@ -97,6 +97,30 @@ public class ReviewServiceImpl implements ReviewService {
         if (page < 1) page = 1;
         if (page > totalPages && totalPages > 0) page = totalPages;
 
+        return getReviewPage(page, pageSize, wrapper, totalCount, totalPages);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Review> getStoreReviewsPage(Long storeId, int page, int pageSize) {
+        // Step1: 构建基础查询条件
+        LambdaQueryWrapper<Review> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Review::getStoreId, storeId);
+
+        // Step2: 查询总记录数
+        int totalCount = reviewMapper.selectCount(wrapper).intValue();
+
+        // Step3: 计算总页数
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+
+        // Step4: 修正非法页码
+        page = Math.max(page, 1);
+        page = totalPages > 0 ? Math.min(page, totalPages) : 1;
+
+        return getReviewPage(page, pageSize, wrapper, totalCount, totalPages);
+    }
+
+    private Page<Review> getReviewPage(int page, int pageSize, LambdaQueryWrapper<Review> wrapper, int totalCount, int totalPages) {
         // Step5: 计算分页偏移量
         int offset = (page - 1) * pageSize;
         wrapper.last("LIMIT " + pageSize + " OFFSET " + offset);

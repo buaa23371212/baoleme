@@ -3,6 +3,7 @@ package org.demo.baoleme.controller;
 import org.demo.baoleme.common.CommonResponse;
 import org.demo.baoleme.common.ResponseBuilder;
 import org.demo.baoleme.dto.request.review.ReviewReadRequest;
+import org.demo.baoleme.dto.response.review.ReviewPageResponse;
 import org.demo.baoleme.dto.response.review.ReviewReadResponse;
 import org.demo.baoleme.pojo.Page;
 import org.demo.baoleme.pojo.Review;
@@ -22,20 +23,39 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
 
-    @GetMapping("/{storeId}")
-    public CommonResponse getStoreReviews(@PathVariable Long storeId) {
-        // Step1: 查询指定店铺的全部评论
-        List<Review> reviews = reviewService.getReviewsByStore(storeId);
-
-        // Step2: 构建响应体（空列表也视为正常结果）
-        return ResponseBuilder.ok(convertToResponse(reviews));
-    }
-
-    @PostMapping("/{storeId}/filter")
-    public CommonResponse getFilteredReviews(
-            @PathVariable Long storeId,
+    @PostMapping("/list")
+    public CommonResponse getStoreReviews(
+            @RequestHeader("Authorization") String tokenHeader,
             @RequestBody ReviewReadRequest request
     ) {
+        Long storeId = request.getStoreId();
+        int page = request.getPage();
+        int pageSize = request.getPageSize();
+
+        // Step1: 验证分页参数合法性
+        if (page < 1 || pageSize < 1) {
+            return ResponseBuilder.fail("分页参数必须大于0");
+        }
+
+        // Step2: 查询分页数据（不进行评分筛选）
+        Page<Review> reviewPage = reviewService.getStoreReviewsPage(
+                storeId,
+                page,
+                pageSize
+        );
+
+        // Step3: 转换为响应结构（空列表也视为正常结果）
+        ReviewPageResponse response = convertToPageResponse(reviewPage);
+        return ResponseBuilder.ok(response);
+    }
+
+    @PostMapping("/filter")
+    public CommonResponse getFilteredReviews(
+            @RequestHeader("Authorization") String tokenHeader,
+            @RequestBody ReviewReadRequest request
+    ) {
+        Long storeId = request.getStoreId();
+
         // Step1: 验证分页参数合法性
         if (request.getPage() < 1 || request.getPageSize() < 1) {
             return ResponseBuilder.fail("分页参数必须大于0");
@@ -59,7 +79,7 @@ public class ReviewController {
             }
         }
 
-        // Step3: 查询符合条件的评论（返回Page对象）
+        // Step3: 查询分页数据
         Page<Review> reviewPage = reviewService.getFilteredReviews(
                 storeId,
                 min,
@@ -69,25 +89,36 @@ public class ReviewController {
                 request.getPageSize()
         );
 
-        // Step4: 转换为响应体（包含分页信息）
-        Page<ReviewReadResponse> responsePage = convertToResponsePage(reviewPage);
+        // Step4: 转换为响应结构
+        ReviewPageResponse response = convertToPageResponse(reviewPage);
 
         // Step5: 返回结果
-        return ResponseBuilder.ok(responsePage);
+        return ResponseBuilder.ok(response);
     }
 
     // 辅助方法：将Review转换为ReviewReadResponse
-    private List<ReviewReadResponse> convertToResponse(List<Review> reviews) {
-        return reviews.stream().map(review -> {
-            ReviewReadResponse response = new ReviewReadResponse();
-            // 使用占位符处理用户信息
-            response.setUsername("用户" + review.getUserId()); // 用户ID占位
-            response.setRating(review.getRating());
-            response.setComment(review.getComment());
-            response.setCreatedAt(review.getCreatedAt());
-            response.setUserAvatar(""); // 空头像
-            response.setImage(review.getImage());
-            return response;
+    private ReviewPageResponse convertToPageResponse(Page<Review> reviewPage) {
+        ReviewPageResponse response = new ReviewPageResponse();
+        response.setCurrentPage(reviewPage.getCurrPage());
+        response.setPageSize(reviewPage.getPageSize());
+        response.setTotalCount(reviewPage.getCount());
+        response.setTotalPages(reviewPage.getPageCount());
+        response.setPrePage(reviewPage.getPrePage());
+        response.setNextPage(reviewPage.getNextPage());
+
+        // 转换评论列表
+        List<ReviewReadResponse> reviews = reviewPage.getList().stream().map(review -> {
+            ReviewReadResponse item = new ReviewReadResponse();
+            item.setUsername("用户" + review.getUserId());  // 用户占位逻辑
+            item.setRating(review.getRating());
+            item.setComment(review.getComment());
+            item.setCreatedAt(review.getCreatedAt());
+            item.setUserAvatar("");  // 空头像
+            item.setImage(review.getImage());
+            return item;
         }).collect(Collectors.toList());
+
+        response.setReviews(reviews);
+        return response;
     }
 }
