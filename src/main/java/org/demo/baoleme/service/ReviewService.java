@@ -47,4 +47,13 @@ public interface ReviewService {
      * @return 评论列表
      */
     List<Review> getReviewsByRatingRange(Integer minRating, Integer maxRating);
+
+    List<Review> getFilteredReviews(
+            Long storeId,
+            Integer minRating,
+            Integer maxRating,
+            Boolean hasImage,
+            int page,
+            int pageSize
+    );
 }

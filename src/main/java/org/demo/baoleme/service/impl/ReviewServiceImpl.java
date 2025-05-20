@@ -63,4 +63,38 @@ public class ReviewServiceImpl implements ReviewService {
                         .between(Review::getRating, minRating, maxRating)
         );
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Review> getFilteredReviews(
+            Long storeId,
+            Integer minRating,
+            Integer maxRating,
+            Boolean hasImage,
+            int page,
+            int pageSize
+    ) {
+        // Step1: 构建分页对象（MyBatis-Plus页码从1开始）
+        Page<Review> pageObj = new Page<>(page, pageSize);
+
+        // Step2: 构建查询条件
+        LambdaQueryWrapper<Review> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Review::getStoreId, storeId);
+
+        // 评分范围条件
+        if (minRating != null && maxRating != null) {
+            wrapper.between(Review::getRating, minRating, maxRating);
+        }
+
+        // 图片过滤条件
+        if (hasImage != null && hasImage) {
+            wrapper.isNotNull(Review::getImage);
+        }
+
+        // Step3: 执行分页查询
+        Page<Review> resultPage = reviewMapper.selectPage(pageObj, wrapper);
+
+        // Step4: 返回当前页数据
+        return resultPage.getRecords();
+    }
 }

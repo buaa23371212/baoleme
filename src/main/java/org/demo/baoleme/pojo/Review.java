@@ -19,9 +19,11 @@ public class Review {
 
     private Long productId;
 
-    private BigDecimal rating;
+    private Integer rating;
 
     private String comment;
 
     private LocalDateTime createdAt;
+
+    private String image;
 }
