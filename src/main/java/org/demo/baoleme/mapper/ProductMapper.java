@@ -17,7 +17,7 @@ public interface ProductMapper extends BaseMapper<Product> {
     @Select("SELECT * FROM product WHERE store_id = #{storeId}")
     List<Product> selectByStoreId(Long storeId);
 
-    // 新增分页查询方法
+    // 分页查询方法
     @Select("""
         SELECT * FROM product 
         WHERE store_id = #{storeId} 
@@ -29,7 +29,7 @@ public interface ProductMapper extends BaseMapper<Product> {
             @Param("pageSize") int pageSize
     );
 
-    // 新增总数统计方法
+    // 总数统计方法
     @Select("SELECT COUNT(*) FROM product WHERE store_id = #{storeId}")
     int countByStore(@Param("storeId") Long storeId);
 
@@ -40,4 +40,7 @@ public interface ProductMapper extends BaseMapper<Product> {
     """)
     int deleteByNameAndStore(@Param("productName") String productName,
                              @Param("storeName") String storeName);
+
+    // TODO: 根据种类查找
+    // TODO: 可选参数。。。
 }
