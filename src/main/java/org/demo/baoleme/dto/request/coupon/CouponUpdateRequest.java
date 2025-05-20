@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-public class CouponUpdateRequset {
+public class CouponUpdateRequest {
     private Long id;
     private String desc;
     private LocalDateTime startAt;
