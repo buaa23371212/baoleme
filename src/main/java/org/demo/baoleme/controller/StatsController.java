@@ -1,6 +1,8 @@
 package org.demo.baoleme.controller;
 
 import jakarta.validation.Valid;
+import org.demo.baoleme.common.CommonResponse;
+import org.demo.baoleme.common.ResponseBuilder;
 import org.demo.baoleme.dto.request.salesStats.*;
 import org.demo.baoleme.dto.response.salesStats.*;
 import org.demo.baoleme.pojo.Product;
@@ -22,7 +24,7 @@ public class StatsController {
     }
 
     @PostMapping("/overview")
-    public SaleOverviewStatsResponse getSalesOverview(
+    public CommonResponse getSalesOverview(
             @RequestHeader("Authorization") String tokenHeader,
             @Valid @RequestBody SaleOverviewStatsRequest request
     ) {
@@ -42,11 +44,11 @@ public class StatsController {
         response.setOrderCount(orderCount);
         response.setPopularProducts(popularProducts);
 
-        return response;
+        return ResponseBuilder.ok(response);
     }
 
     @PostMapping("/trend")
-    public SaleTrendStatsResponse getSalesTrend(
+    public CommonResponse getSalesTrend(
             @RequestHeader("Authorization") String tokenHeader,
             @Valid @RequestBody SaleTrendStatsRequest request
     ) {
@@ -71,7 +73,7 @@ public class StatsController {
         response.setDates(dateLabels);
         response.setValues(salesValues);
 
-        return response;
+        return ResponseBuilder.ok(response);
     }
 
     // 辅助方法：解析时间范围枚举为具体日期
