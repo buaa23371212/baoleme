@@ -81,29 +81,7 @@ public interface OrderMapper extends BaseMapper<Order> {
     @Select("SELECT * FROM `order` WHERE id = #{orderId}")
     Order selectById(@Param("orderId") Long orderId);
 
-    /**
-     * 商家完成订单（状态改为2）
-     */
-    @Update("UPDATE `order` SET status = 2 WHERE id = #{orderId} AND store_id = #{storeId}")
-    int merchantCompleteOrder(@Param("orderId") Long orderId, @Param("storeId") Long storeId);
-
-    /**
-     * 商家取消订单（状态改为4）
-     */
-    @Update("UPDATE `order` SET status = 4 WHERE id = #{orderId} AND store_id = #{storeId}")
-    int merchantCancelOrder(@Param("orderId") Long orderId, @Param("storeId") Long storeId);
-
-    @Mapper(
-            """UPDATE orders
-            SET
-    status = #{newStatus},
-    cancel_reason = #{cancelReason},
-    updated_at = NOW()
-    WHERE
-    id = #{orderId}
-    AND store_id = #{storeId}
-    """
-    )
+    @Update("UPDATE `order` SET status = #{newStatus} WHERE id = #{orderId} AND store_id = #{storeId}")
     int updateByMerchant(
             @Param("orderId") Long orderId,
             @Param("storeId") Long storeId,
