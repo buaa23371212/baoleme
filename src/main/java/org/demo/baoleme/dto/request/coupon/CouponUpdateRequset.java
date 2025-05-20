@@ -8,11 +8,12 @@ import java.time.LocalDateTime;
 
 @Data
 public class CouponUpdateRequset {
+    private Long id;
     private String desc;
     private LocalDateTime startAt;
     private LocalDateTime endAt;
     private Coupon.CouponType type;
     private BigDecimal discount;
-    private int fullAmount;
-    private int reduceAmount;
+    private Integer fullAmount;
+    private Integer reduceAmount;
 }

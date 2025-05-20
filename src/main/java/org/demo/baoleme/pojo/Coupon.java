@@ -31,9 +31,9 @@ public class Coupon {
 
     private BigDecimal discount;
 
-    private int fullAmount;
+    private Integer fullAmount;
 
-    private int reduceAmount;
+    private Integer reduceAmount;
 
     public enum CouponType {
         DISCOUNT("DISCOUNT", "折扣"),

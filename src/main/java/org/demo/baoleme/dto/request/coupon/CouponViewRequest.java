@@ -13,6 +13,9 @@ public class CouponViewRequest {
     private LocalDateTime endAt;
     private Coupon.CouponType type;
     private BigDecimal discount;
-    private int fullAmount;
-    private int reduceAmount;
+    private Integer fullAmount;
+    private Integer reduceAmount;
+
+    private int page = 1;
+    private int pageSize = 10;
 }

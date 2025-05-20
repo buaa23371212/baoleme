@@ -16,6 +16,6 @@ public class CouponViewResponse {
     private LocalDateTime endAt;
     private Coupon.CouponType type;
     private BigDecimal discount;
-    private int fullAmount;
-    private int reduceAmount;
+    private Integer fullAmount;
+    private Integer reduceAmount;
 }
