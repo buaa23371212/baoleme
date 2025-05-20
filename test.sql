@@ -142,6 +142,7 @@ CREATE TABLE IF NOT EXISTS review (
                                       product_id BIGINT,
                                       rating INT NOT NULL,
                                       comment TEXT,
+                                      image VARCHAR(50),
                                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                       FOREIGN KEY (user_id) REFERENCES user(id),
                                       FOREIGN KEY (store_id) REFERENCES store(id),

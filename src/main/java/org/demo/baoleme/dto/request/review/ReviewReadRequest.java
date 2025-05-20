@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 public class ReviewReadRequest {
     private Long storeId;
-    private int page;
-    private int pageSize;
+    private int page = 1;
+    private int pageSize = 10;
     private ReviewFilterType type;
     private Boolean hasImage; // 是否带图（true/false）
 

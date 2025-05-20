@@ -28,6 +28,8 @@ public class ReviewController {
             @RequestHeader("Authorization") String tokenHeader,
             @RequestBody ReviewReadRequest request
     ) {
+        System.out.println("收到请求：" + request);
+
         Long storeId = request.getStoreId();
         int page = request.getPage();
         int pageSize = request.getPageSize();
@@ -46,6 +48,8 @@ public class ReviewController {
 
         // Step3: 转换为响应结构（空列表也视为正常结果）
         ReviewPageResponse response = convertToPageResponse(reviewPage);
+
+        System.out.println("回复：" + response);
         return ResponseBuilder.ok(response);
     }
 
@@ -54,6 +58,8 @@ public class ReviewController {
             @RequestHeader("Authorization") String tokenHeader,
             @RequestBody ReviewReadRequest request
     ) {
+        System.out.println("收到请求：" + request);
+
         Long storeId = request.getStoreId();
 
         // Step1: 验证分页参数合法性
@@ -119,6 +125,8 @@ public class ReviewController {
         }).collect(Collectors.toList());
 
         response.setReviews(reviews);
+
+        System.out.println("回复：" + response);
         return response;
     }
 }
