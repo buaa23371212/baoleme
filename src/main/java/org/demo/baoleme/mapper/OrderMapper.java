@@ -87,4 +87,23 @@ public interface OrderMapper extends BaseMapper<Order> {
             @Param("storeId") Long storeId,
             @Param("newStatus") Integer newStatus
     );
+
+    @Select("""
+            SELECT * FROM `order`
+            WHERE store_id = #{storeId}
+            """)
+    List<Order> selectByStoreId(@Param("storeId") Long storeId);
+
+    // TODO: 使用OrderMapper.xml，实现可变参数
+    @Select("""
+            SELECT *
+            FROM `order`
+            WHERE store_id = #{storeId}
+            LIMIT #{offset}, #{pageSize}                                
+            """)
+    List<Order> selectByStoreIdUsingPage(
+            @Param("storeId") Long storeId,
+            @Param("offset") int offset,
+            @Param("pageSize") int pageSize
+    );
 }

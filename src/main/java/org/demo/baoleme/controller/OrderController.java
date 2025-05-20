@@ -139,20 +139,25 @@ public class OrderController {
      */
     @PutMapping("/merchant-update")
     public CommonResponse updateOrderByMerchant(
-
+            @RequestHeader("Authorization") String tokenHeader,
             @Valid @RequestBody OrderUpdateByMerchantRequest request
     ) {
         Order order = orderService.getOrderById(request.getId());
         if (order.getStatus() != 1) {
             return ResponseBuilder.fail("订单更新失败：当前状态商家无权更新");
         }
+        if (request.getNewStatus() == null){
+            return ResponseBuilder.fail("订单更新失败：商家未设置新状态");
+        }
+        if (request.getCancelReason() == null){
+            return ResponseBuilder.fail("订单更新失败：商家未设置取消原因");
+        }
 
         // Step 1: 调用Service层执行更新
         boolean ok = orderService.updateOrderByMerchant(
                 request.getId(),
                 request.getStoreId(),
-                request.getNewStatus(),
-                request.getCancelReason()
+                request.getNewStatus()
         );
 
         // Step 2: 处理失败情况
@@ -172,5 +177,47 @@ public class OrderController {
         response.setCancelReason(request.getCancelReason());
 
         return ResponseBuilder.ok(response);
+    }
+
+    /**
+     * 商家分页查看订单
+     */
+    @PostMapping("/merchant-list")
+    public CommonResponse ordersReadByMerchant(
+            @RequestHeader("Authorization") String tokenHeader,
+            @Valid @RequestBody OrderReadByMerchantRequest request
+    ) {
+        // Step 1: 参数校验
+        if (request.getStoreId() == null) {
+            return ResponseBuilder.fail("订单查看失败：未提供store_id字段");
+        }
+
+        // Step 2: 调用Service分页查询
+        List<Order> orders = orderService.getOrdersByMerchant(
+                request.getStoreId(),
+                request.getStatus(),
+                request.getPage(),
+                request.getPageSize()
+        );
+
+        // Step 3: 转换为响应对象
+        List<OrderReadByMerchantResponse> responses = orders.stream().map(order -> {
+            OrderReadByMerchantResponse resp = new OrderReadByMerchantResponse();
+            resp.setOrderId(order.getId());
+            resp.setUserName(order.getUserId()); // 假设用户ID字段为userId
+            resp.setStatus(order.getStatus());
+            resp.setTotalPrice(order.getTotalPrice());
+            resp.setCreatedAt(order.getCreatedAt());
+            return resp;
+        }).toList();
+
+        // Step 4: 包装分页响应
+        OrderPageForMerchantResponse pageResponse = new OrderPageForMerchantResponse();
+        pageResponse.setList(responses);
+        pageResponse.setCurrentPage(request.getPage());
+        pageResponse.setPageSize(request.getPageSize());
+        // 总记录数需另查（此处省略具体实现）
+
+        return ResponseBuilder.ok(pageResponse);
     }
 }

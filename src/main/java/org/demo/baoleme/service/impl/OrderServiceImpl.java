@@ -76,14 +76,23 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public boolean updateOrderByMerchant(Long orderId, Long storeId, Integer newStatus, String cancelReason) {
+    public List<Order> getOrderByStoreId(Long storeId) {
+        return orderMapper.selectByStoreId(storeId);
+    }
+
+    @Override
+    public List<Order> getOrdersByMerchant(Long storeId, Integer status, int page, int pageSize) {
+        int offset = (page - 1) * pageSize;
+        return orderMapper.selectByStoreIdWithStatus(storeId, status, offset, pageSize);
+    }
+
+    @Override
+    public boolean updateOrderByMerchant(Long orderId, Long storeId, Integer newStatus) {
         // Step 1: 查询订单当前状态和店铺ID
         Order order = orderMapper.selectById(orderId);
         if (order == null || !order.getStoreId().equals(storeId)) {
             return false; // 订单不存在或店铺不匹配
         }
-
-        // TODO: 未过滤空值
 
         // Step 2: 执行更新操作
         int rowsUpdated = orderMapper.updateByMerchant(

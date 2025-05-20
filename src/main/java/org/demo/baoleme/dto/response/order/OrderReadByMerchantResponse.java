@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class OrderViewResponse {
+public class OrderReadByMerchantResponse {
     private Long orderId;
     private Long userName;
     private Integer status;
