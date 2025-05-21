@@ -69,6 +69,9 @@ public class StoreController {
         // Step1: 提取店铺ID
         Long storeId = request.getStoreId();
 
+        // 验证店铺是否属于对应merchant
+        if (validateStoreOwnerShip(storeId)) return ResponseBuilder.fail("该店铺不属于您");
+
         // Step2: 执行数据库查询
         Store store = storeService.getStoreById(storeId);
 
@@ -96,6 +99,9 @@ public class StoreController {
         // Step1: 初始化领域对象
         Store store = new Store();
         store.setId(request.getId());
+
+        // 验证店铺是否属于对应merchant
+        if (validateStoreOwnerShip(store.getId())) return ResponseBuilder.fail("该店铺不属于您");
 
         // Step2: 拷贝更新字段
         BeanUtils.copyProperties(request, store);
@@ -128,6 +134,9 @@ public class StoreController {
         Long storeId = request.getId();
         int status = request.getStatus();
 
+        // 验证店铺是否属于对应merchant
+        if (validateStoreOwnerShip(storeId)) return ResponseBuilder.fail("该店铺不属于您");
+
         // Step2: 校验状态值
         if (status < 0 || status > 1) {
             System.out.println("非法状态值: " + status);
@@ -154,6 +163,9 @@ public class StoreController {
         // Step1: 获取目标店铺ID
         Long storeId = request.getStoreId();
 
+        // 验证店铺是否属于对应merchant
+        if (validateStoreOwnerShip(storeId)) return ResponseBuilder.fail("该店铺不属于您");
+
         // Step2: 执行删除操作
         boolean success = storeService.deleteStore(storeId);
 
@@ -162,5 +174,10 @@ public class StoreController {
         return success ?
                 ResponseBuilder.ok("店铺数据已删除") :
                 ResponseBuilder.fail("删除操作失败，店铺可能不存在");
+    }
+
+    private boolean validateStoreOwnerShip(Long storeId) {
+        Long merchantId = UserHolder.getId();
+        return !storeService.validateStoreOwnership(storeId, merchantId);
     }
 }

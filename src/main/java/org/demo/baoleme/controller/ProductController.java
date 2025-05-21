@@ -2,11 +2,13 @@ package org.demo.baoleme.controller;
 
 import org.demo.baoleme.common.CommonResponse;
 import org.demo.baoleme.common.ResponseBuilder;
+import org.demo.baoleme.common.UserHolder;
 import org.demo.baoleme.dto.request.product.*;
 import org.demo.baoleme.dto.response.product.*;
 import org.demo.baoleme.pojo.Page;
 import org.demo.baoleme.pojo.Product;
 import org.demo.baoleme.service.ProductService;
+import org.demo.baoleme.service.StoreService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +21,15 @@ import java.util.stream.Collectors;
 public class ProductController {
 
     private final ProductService productService;
+    private final StoreService storeService;
 
     @Autowired
-    public ProductController(ProductService productService) {
+    public ProductController(
+            ProductService productService,
+            StoreService storeService
+    ) {
         this.productService = productService;
+        this.storeService = storeService;
     }
 
     @PostMapping("/create")
@@ -36,6 +43,11 @@ public class ProductController {
         // Step1: 创建 Product 对象并拷贝属性
         Product product = new Product();
         BeanUtils.copyProperties(request, product);
+
+        // TODO: 验证请求必填字段是否为空
+
+        // 验证店铺是否属于对应merchant
+        if (validateStoreOwnerShip(product.getStoreId())) return ResponseBuilder.fail("该店铺不属于您");
 
         // Step2: 调用 Service 创建商品
         Product createdProduct = productService.createProduct(product);
@@ -74,6 +86,9 @@ public class ProductController {
             return errorResponse;
         }
 
+        // 验证店铺是否属于对应merchant
+        if (validateStoreOwnerShip(product.getStoreId())) return ResponseBuilder.fail("该店铺不属于您");
+
         // Step3: 构建响应体
         ProductViewResponse response = new ProductViewResponse();
         BeanUtils.copyProperties(product, response);
@@ -92,6 +107,9 @@ public class ProductController {
         Long storeId = request.getStoreId();
         int currentPage = request.getPage();       // 新增页码参数
         int pageSize = request.getPageSize(); // 新增分页大小参数
+
+        // 验证店铺是否属于对应merchant
+        if (validateStoreOwnerShip(storeId)) return ResponseBuilder.fail("该店铺不属于您");
 
         // Step2: 调用Service获取分页数据
         Page<Product> page = productService.getProductsByStore(storeId, currentPage, pageSize);
@@ -133,7 +151,11 @@ public class ProductController {
         BeanUtils.copyProperties(request, product);
 
         // Step3: 调用 Service 更新数据
+        // TODO: 返回一个newProduct
         boolean success = productService.updateProduct(product);
+
+        // 验证店铺是否属于对应merchant
+        // if (validateStoreOwnerShip(newProduct.getStoreId())) return ResponseBuilder.fail("该店铺不属于您");
 
         // Step4: 处理更新结果
         if (!success) {
@@ -161,6 +183,7 @@ public class ProductController {
         int status = request.getStatus();
 
         // Step1: 执行状态更新
+        // TODO: 同上
         boolean success = productService.updateProductStatus(productId, status);
 
         // Step2: 返回操作结果
@@ -182,6 +205,9 @@ public class ProductController {
         // Step1: 从请求体中获取商品ID
         Long productId = request.getId();
 
+        // 验证店铺是否属于对应merchant
+        if (validateStoreOwnerShip(request.getStoreId())) return ResponseBuilder.fail("该店铺不属于您");
+
         // Step2: 执行删除操作
         boolean success = productService.deleteProduct(productId);
 
@@ -191,5 +217,10 @@ public class ProductController {
                 ResponseBuilder.fail("删除失败，商品可能不存在");
         System.out.println("Response Body: " + response);
         return response;
+    }
+
+    private boolean validateStoreOwnerShip(Long storeId) {
+        Long merchantId = UserHolder.getId();
+        return !storeService.validateStoreOwnership(storeId, merchantId);
     }
 }
