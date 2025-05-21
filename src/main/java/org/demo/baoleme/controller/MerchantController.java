@@ -59,6 +59,7 @@ public class MerchantController {
     public CommonResponse login(@RequestBody MerchantLoginRequest request) {
         System.out.println("收到登录请求: " + request);
 
+        // TODO: 手机号
         // Step1: 根据用户名查询商家
         Merchant result = merchantService.getMerchantByUsername(request.getUsername());
 
