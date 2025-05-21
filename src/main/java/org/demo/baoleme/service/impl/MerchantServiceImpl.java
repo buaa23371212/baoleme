@@ -64,6 +64,11 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
+    public Merchant getMerchantByPhone(String phone) {
+        return merchantMapper.selectByPhone(phone);
+    }
+
+    @Override
     public List<Merchant> getAllMerchants() {
         return merchantMapper.selectAll();
     }
