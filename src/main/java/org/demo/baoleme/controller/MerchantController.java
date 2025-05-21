@@ -1,5 +1,6 @@
 package org.demo.baoleme.controller;
 
+import jakarta.validation.Valid;
 import org.demo.baoleme.common.CommonResponse;
 import org.demo.baoleme.common.ResponseBuilder;
 import org.demo.baoleme.dto.request.merchant.*;
@@ -30,7 +31,9 @@ public class MerchantController {
     }
 
     @PostMapping("/register")
-    public CommonResponse register(@RequestBody MerchantRegisterRequest request) {
+    public CommonResponse register(
+            @RequestBody @Valid MerchantRegisterRequest request
+    ) {
         System.out.println("收到注册请求: " + request);
 
         // Step1: 创建Merchant对象并拷贝属性
@@ -56,7 +59,9 @@ public class MerchantController {
     }
 
     @PostMapping("/login")
-    public CommonResponse login(@RequestBody MerchantLoginRequest request) {
+    public CommonResponse login(
+            @RequestBody @Valid MerchantLoginRequest request
+    ) {
         System.out.println("收到登录请求: " + request);
 
         // Step1: 根据手机号查询商家
@@ -94,7 +99,9 @@ public class MerchantController {
     }
 
     @GetMapping("/info")
-    public CommonResponse getInfo(@RequestHeader("Authorization") String tokenHeader) {
+    public CommonResponse getInfo(
+            @RequestHeader("Authorization") String tokenHeader
+    ) {
         System.out.println("收到获取信息请求");
 
         // Step1: 从线程上下文获取用户ID
@@ -118,8 +125,10 @@ public class MerchantController {
     }
 
     @PutMapping("/update")
-    public CommonResponse update(@RequestBody MerchantUpdateRequest request,
-                                 @RequestHeader("Authorization") String tokenHeader) {
+    public CommonResponse update(
+            @RequestBody MerchantUpdateRequest request,
+            @RequestHeader("Authorization") String tokenHeader
+    ) {
         System.out.println("收到更新请求: " + request);
 
         // Step1: 创建Merchant对象并设置用户ID
