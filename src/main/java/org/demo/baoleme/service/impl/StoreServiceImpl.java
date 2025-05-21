@@ -121,4 +121,24 @@ public class StoreServiceImpl implements StoreService {
         // Step2: 执行删除
         return storeMapper.deleteById(storeId) > 0;
     }
+
+    @Override
+    @Transactional
+    public boolean validateStoreOwnership(Long storeId, Long merchantId){
+        // Step1: 传入参数不为空
+        if (storeId == null || merchantId == null) {
+            System.out.println("error: 无效参数");
+            return false;
+        }
+
+        // Step2: 数据库能得到有效数据
+        Store store = storeMapper.selectById(storeId);
+        if (store == null) {
+            System.out.println("error: 找不到店铺");
+            return false;
+        }
+
+        // Step3: 判断merchantId是否相等
+        return store.getMerchantId().equals(merchantId);
+    }
 }

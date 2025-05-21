@@ -48,4 +48,6 @@ public interface StoreService {
      * @return 是否成功
      */
     boolean deleteStore(Long storeId);
+
+    boolean validateStoreOwnership(Long storeId, Long merchantId);
 }
